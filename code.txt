@@ -1,0 +1,103 @@
+; Calculator
+; By Daniel Pany
+; 1. Show problem
+; 2. Calculate answer
+; 3. Show output
+
+	JMP start
+num1:		db 4
+operation:	db "+"
+num2:		db 5
+
+operations:
+	db "+-*/"
+	db 0
+
+start:
+	CALL printProblem
+	HLT
+
+printProblem:
+	; Save anything in registers
+	PUSH A
+	PUSH B
+	PUSH C
+	PUSH D
+	; Put problem into registers
+	MOV A, [num1]
+	MOV B, [operation]
+	MOV C, [num2]
+	MOV D, 0xE8
+	; Turn HEX to ASCII
+	ADD A, 48
+	ADD C, 48
+	; Move registers into output
+	MOV [D], A
+	INC D
+	MOV [D], B
+	INC D
+	MOV [D], C
+	INC D
+	MOV [D], 0x3D
+	INC D
+	; Set the values back from ASCII to HEX
+	SUB A, 48
+	SUB C, 48
+
+calculate:
+	; Free Register D and set it to 0
+	PUSH D
+	PUSH 0
+	POP D
+
+	; Determine which operation was selected
+	ADD D, operations
+	CMP B, [D]
+	JZ sum
+	CMP B, [D+1]
+	JZ difference
+	CMP B, [D+2]
+	JZ product
+	CMP B, [D+3]
+	JZ quotient
+	; Stop if the operation wasn't correct
+	HLT
+
+sum:
+	ADD A, C
+	JMP printAnswer
+difference:
+	SUB A, C
+	JMP printAnswer
+product:
+	MUL C
+	JMP printAnswer
+quotient:
+	DIV C
+	JMP printAnswer
+
+	
+printAnswer:
+	POP D
+	ADD A, 48
+	MOV [D], A
+	; Put the original values back to the registers
+	POP A
+	POP B
+	POP C
+	POP D
+	RET
+	
+	
+	
+	
+	
+	
+
+
+
+
+
+
+
+	
